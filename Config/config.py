@@ -1,6 +1,5 @@
-class Config:
-    """
-    Clase de configuración para rutas y parámetros del ETL.
-    """
-    INPUT_PATH = '/workspaces/ETLProject/Extract/Files/ncr_ride_bookings.csv'
-    OUTPUT_PATH = '/workspaces/ETLProject/Extract/Files/output_clean.csv'
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Config/
+DATA_PATH = os.path.join(BASE_DIR, "..", "Extract", "Files", "Nvidia.csv")
+OUTPUT_PATH = os.path.join(BASE_DIR, "..", "Extract", "Files", "Nvidia_clean.csv")

@@ -1,37 +1,25 @@
 class Transformer:
-    """
-    Clase para transformar y limpiar los datos extraídos.
-    """
     def __init__(self, df):
         self.df = df
 
-    def clean(self):
+    def run(self):
         """
-        Realiza limpieza y transformación de los datos.
+        Limpia y transforma los datos:
+        - Convierte 'Date' a datetime (con precisión ns)
+        - Ordena por fecha
+        - Llena valores nulos
+        - Agrega columnas 'Daily Change' y 'Percent Change'
         """
-        import pandas as pd
-        df = self.df.copy()
-        # Limpieza de columnas de fecha y hora
-        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-        df['Time'] = pd.to_datetime(df['Time'], errors='coerce').dt.time
-        # Eliminar filas con Booking ID nulo
-        df = df.dropna(subset=['Booking ID'])
-        # Rellenar valores nulos en columnas numéricas con 0
-        num_cols = ['Avg VTAT', 'Avg CTAT', 'Booking Value', 'Ride Distance', 'Driver Ratings', 'Customer Rating']
-        for col in num_cols:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-        # Rellenar valores nulos en columnas de texto con 'Unknown'
-        text_cols = ['Booking Status', 'Vehicle Type', 'Pickup Location', 'Drop Location',
-                     'Reason for cancelling by Customer', 'Driver Cancellation Reason',
-                     'Incomplete Rides Reason', 'Payment Method']
-        for col in text_cols:
-            if col in df.columns:
-                df[col] = df[col].fillna('Unknown')
-        # Convertir flags a booleanos
-        flag_cols = ['Cancelled Rides by Customer', 'Cancelled Rides by Driver', 'Incomplete Rides']
-        for col in flag_cols:
-            if col in df.columns:
-                df[col] = df[col].astype(bool)
-        self.df = df
+        if self.df is None:
+            return None
+
+        # Cambiar aquí: datetime64[ns]
+        self.df['Date'] = self.df['Date'].astype('datetime64[ns]')
+        self.df.sort_values('Date', inplace=True)
+        self.df.fillna(method='ffill', inplace=True)
+
+        self.df['Daily Change'] = self.df['Close'] - self.df['Open']
+        self.df['Percent Change'] = ((self.df['Close'] - self.df['Open']) / self.df['Open']) * 100
+
+        print("[Transformer] Transformación completada")
         return self.df

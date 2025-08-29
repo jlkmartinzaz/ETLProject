@@ -1,16 +1,17 @@
-class Loader:
-    """
-    Clase para cargar los datos limpios a un destino.
-    """
-    def __init__(self, df):
-        self.df = df
+from Config.config import OUTPUT_PATH
 
-    def to_csv(self, output_path):
+class Loader:
+    def __init__(self, df, output_path=OUTPUT_PATH):
+        self.df = df
+        self.output_path = output_path
+
+    def run(self):
         """
-        Guarda el DataFrame limpio en un archivo CSV.
+        Guarda el DataFrame limpio en CSV
         """
-        try:
-            self.df.to_csv(output_path, index=False)
-            print(f"Datos guardados en {output_path}")
-        except Exception as e:
-            print(f"Error al guardar datos: {e}")
+        if self.df is None:
+            print("[Loader] No hay datos para cargar")
+            return
+
+        self.df.to_csv(self.output_path, index=False)
+        print(f"[Loader] Datos cargados en: {self.output_path}")

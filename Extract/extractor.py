@@ -1,18 +1,18 @@
+import pandas as pd
+from Config.config import DATA_PATH
+
 class Extractor:
-    """
-    Clase para extraer datos de archivos fuente.
-    """
-    def __init__(self, file_path):
+    def __init__(self, file_path=DATA_PATH):
         self.file_path = file_path
 
-    def extract(self):
+    def run(self):
         """
-        Extrae los datos del archivo especificado.
+        Extrae los datos del CSV y retorna un DataFrame
         """
-        import pandas as pd
         try:
             df = pd.read_csv(self.file_path)
+            print(f"[Extractor] Datos extraídos: {len(df)} filas")
             return df
-        except Exception as e:
-            print(f"Error al extraer datos: {e}")
+        except FileNotFoundError:
+            print(f"[Extractor] Archivo no encontrado: {self.file_path}")
             return None
