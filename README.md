@@ -1,69 +1,132 @@
-# ETLProject
+# Introducción
+
+El presente proyecto consiste en un flujo ETL (**Extract, Transform,
+Load**) para procesar datos históricos de acciones de Nvidia. El
+objetivo principal fue leer un archivo CSV, limpiar y transformar los
+datos, y finalmente generar un nuevo CSV listo para análisis
+posteriores.
+
+# Dataset de Nvidia
+
+El proyecto utiliza un conjunto de datos históricos de las acciones de
+Nvidia.[^1]
 
 ## Descripción
-Este proyecto implementa un pipeline ETL (Extract, Transform, Load) para procesar y limpiar datos de viajes de Uber, utilizando el dataset disponible en Kaggle: [Uber Ride Analytics Dashboard](https://www.kaggle.com/datasets/yashdevladdha/uber-ride-analytics-dashboard).
 
-El objetivo es extraer los datos crudos, transformarlos mediante limpieza y normalización, y cargarlos en un archivo listo para análisis.
+Este dataset contiene información diaria de las acciones de Nvidia desde
+1999 hasta 2024. Es útil para análisis financieros, predicciones de
+precios y estudios de tendencias del mercado.
 
-## Estructura del Proyecto
+## Columnas del dataset
 
-```
-ETLProject/
-├── Extract/
-│   └── extractor.py
-├── Transform/
-│   └── transformer.py
-├── Load/
-│   └── loader.py
-├── Config/
-│   └── config.py
-```
+-   **Date**: Fecha de la transacción.
 
-## Uso del DataFrame
-El archivo principal de datos es `ncr_ride_bookings.csv`, que contiene información sobre reservas de viajes, cancelaciones, valoraciones, métodos de pago y más.
+-   **Open**: Precio de apertura de la acción.
 
-### Columnas principales:
-- Date: Fecha de la reserva
-- Time: Hora de la reserva
-- Booking ID: Identificador único de la reserva
-- Booking Status: Estado de la reserva (Completada, Cancelada, etc.)
-- Customer ID: Identificador del cliente
-- Vehicle Type: Tipo de vehículo
-- Pickup Location: Origen
-- Drop Location: Destino
-- Avg VTAT: Tiempo promedio de llegada del vehículo
-- Avg CTAT: Tiempo promedio de llegada del cliente
-- Cancelled Rides by Customer: Cancelación por cliente
-- Reason for cancelling by Customer: Motivo de cancelación por cliente
-- Cancelled Rides by Driver: Cancelación por conductor
-- Driver Cancellation Reason: Motivo de cancelación por conductor
-- Incomplete Rides: Viaje incompleto
-- Incomplete Rides Reason: Motivo de viaje incompleto
-- Booking Value: Monto total del viaje
-- Ride Distance: Distancia recorrida (km)
-- Driver Ratings: Calificación al conductor
-- Customer Rating: Calificación del cliente
-- Payment Method: Método de pago
+-   **High**: Precio máximo alcanzado durante el día.
 
-## Ejecución del pipeline ETL
-1. Ajusta las rutas de entrada y salida en `Config/config.py` si es necesario.
-2. Ejecuta el flujo ETL desde un script principal:
+-   **Low**: Precio mínimo alcanzado durante el día.
 
-```python
-from Config.config import Config
-from Extract.extractor import Extractor
-from Transform.transformer import Transformer
-from Load.loader import Loader
+-   **Close**: Precio de cierre de la acción.
 
-extractor = Extractor(Config.INPUT_PATH)
-df = extractor.extract()
-transformer = Transformer(df)
-df_clean = transformer.clean()
-loader = Loader(df_clean)
-loader.to_csv(Config.OUTPUT_PATH)
-```
+-   **Adj Close**: Precio de cierre ajustado por dividendos y splits.
 
-Esto generará un archivo limpio listo para análisis o visualización.
+-   **Volume**: Número de acciones negociadas.
 
-## Fuente de datos
-Dataset original: [Uber Ride Analytics Dashboard - Kaggle](https://www.kaggle.com/datasets/yashdevladdha/uber-ride-analytics-dashboard)
+## Ejemplo de filas
+
+::: center
+      Date       Open     High     Low     Close    Adj Close   Volume
+  ------------ -------- -------- -------- -------- ----------- --------
+   2024-12-31   150.00   155.00   149.00   153.00    153.00     200000
+   2024-12-30   148.50   151.00   147.00   150.50    150.50     180000
+:::
+
+# Herramientas utilizadas
+
+-   **Python 3.12** para la implementación del flujo ETL.
+
+-   **Pandas** para manipulación y transformación de datos.
+
+-   **Vim** como editor de código.
+
+-   **Git y GitHub** para control de versiones y gestión de ramas
+    (`main`, `develop`, `release`).
+
+-   **ChatGPT** para apoyo en la programación, depuración de errores y
+    recomendaciones de flujo ETL.
+
+# Estructura del proyecto
+
+-   Config/config.py
+
+-   Extract/extractor.py
+
+-   Extract/Files/Nvidia.csv
+
+-   Transform/transformer.py
+
+-   Load/loader.py
+
+-   main.py
+
+# Flujo ETL
+
+## Extract
+
+Se implementó la clase `Extractor` en `Extract/extractor.py`, que lee el
+CSV original (`Nvidia.csv`) y retorna un DataFrame de Pandas.
+
+## Transform
+
+La clase `Transformer` en `Transform/transformer.py` realiza:
+
+-   Conversión de la columna `Date` a tipo `datetime64[ns]`.
+
+-   Ordenación por fecha.
+
+-   Relleno de valores nulos.
+
+-   Cálculo de nuevas columnas:
+
+    -   `Daily Change` = `Close - Open`
+
+    -   `Percent Change` = $\frac{Close - Open}{Open} \times 100$
+
+## Load
+
+La clase `Loader` en `Load/loader.py` guarda el DataFrame final en un
+nuevo CSV llamado `Nvidia_clean.csv` en la carpeta `Extract/Files/`.
+
+# Prompts de ChatGPT más relevantes
+
+-   Depurar errores de rutas y lectura de CSV.
+
+-   Ajustar transformaciones de pandas para evitar errores con
+    `datetime64`.
+
+-   Comandos de Git para el trabajo con ramas (`main`, `develop`,
+    `release`).
+
+# Resultados
+
+Al ejecutar el script principal:
+
+            python3 main.py
+
+Se obtiene:
+
+-   Archivo limpio: `Extract/Files/Nvidia_clean.csv`
+
+-   Columnas originales más `Daily Change` y `Percent Change`
+
+-   5872 filas procesadas correctamente
+
+# Conclusiones
+
+El proyecto demuestra cómo construir un flujo ETL modular y reproducible
+usando Python. El uso de ChatGPT facilitó la depuración y la
+optimización de rutas y transformaciones. La gestión de ramas en Git
+permite un desarrollo ordenado y preparación de releases.
+
+[^1]: <https://www.kaggle.com/datasets/ranugadisansagamage/nividia-stock>
