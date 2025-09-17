@@ -1,0 +1,8 @@
+pandas
+python-dotenv
+sqlalchemy
+alembic
+pytest
+python-dateutil
+seaborn
+matplotlib

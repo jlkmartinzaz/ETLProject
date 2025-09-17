@@ -1,19 +1,27 @@
-from Extract.extractor import Extractor
-from Transform.transformer import Transformer
-from Load.loader import Loader
+from extract.extractor import read_csv
+from transform.transformer import transform_data, save_clean_csv
+from load.loader import load_to_db, generate_plots
+from config.config import logger
 
-def main():
-    # Extract
-    extractor = Extractor()
-    df = extractor.run()
 
-    # Transform
-    transformer = Transformer(df)
-    df_transformed = transformer.run()
+def run_etl():
+    logger.info("=== Iniciando ETL ===")
 
-    # Load
-    loader = Loader(df_transformed)
-    loader.run()
+    # 1. Extraer
+    df = read_csv()
+
+    # 2. Transformar
+    df_clean = transform_data(df)
+    clean_file = save_clean_csv(df_clean)
+
+    # 3. Cargar
+    load_to_db(df_clean)
+
+    # 4. Visualizar
+    generate_plots(df_clean)
+
+    logger.info("=== Proceso ETL completado ===")
+
 
 if __name__ == "__main__":
-    main()
+    run_etl()
