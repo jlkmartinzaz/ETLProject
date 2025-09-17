@@ -1,132 +1,125 @@
-# Introducción
+# ETLProject – YouTube Sports Channels Statistics
+## Introducción
 
-El presente proyecto consiste en un flujo ETL (**Extract, Transform,
-Load**) para procesar datos históricos de acciones de Nvidia. El
-objetivo principal fue leer un archivo CSV, limpiar y transformar los
-datos, y finalmente generar un nuevo CSV listo para análisis
-posteriores.
+Este proyecto implementa un pipeline ETL (Extract, Transform, Load) para analizar estadísticas de canales de YouTube relacionados con deportes.
 
-# Dataset de Nvidia
+A partir de un dataset público de Kaggle, el flujo es el siguiente:
 
-El proyecto utiliza un conjunto de datos históricos de las acciones de
-Nvidia.[^1]
+Extract → Carga el CSV con información de canales.
 
-## Descripción
+Transform → Limpieza, normalización y renombrado de columnas.
 
-Este dataset contiene información diaria de las acciones de Nvidia desde
-1999 hasta 2024. Es útil para análisis financieros, predicciones de
-precios y estudios de tendencias del mercado.
+Load → Inserción de los datos en una base de datos SQLite y generación de gráficas exploratorias.
 
-## Columnas del dataset
+## Estructura del Proyecto
+ETLProject/
+│
+├── config/               # Configuración del proyecto
+│   └── config.py
+│
+├── extract/              # Extracción de datos
+│   └── extractor.py
+│
+├── transform/            # Transformación de datos
+│   └── transformer.py
+│
+├── load/                 # Carga de datos y visualización
+│   └── loader.py
+│
+├── data/                 # Carpeta de datos
+│   ├── raw/              # Datos originales (entrada)
+│   │   └── yt_sports_channels_stats.csv
+│   ├── clean/            # Datos transformados + gráficas
+│   │   ├── yt_sports_channels_stats_clean.csv
+│   │   ├── distribucion_suscriptores.png
+│   │   ├── scatter_views_subs.png
+│   │   └── top10_videos.png
+│   └── youtube_channels.db   # Base de datos SQLite
+│
+├── main.py               # Script principal del pipeline
+├── .env                  # Variables de entorno
+├── requirements.txt      # Dependencias del proyecto
+└── README.md             # Documentación
 
--   **Date**: Fecha de la transacción.
+## Instalación
+1. Clonar el repositorio
+git clone https://github.com/jlkmartinzaz/ETLProject.git
+cd ETLProject
 
--   **Open**: Precio de apertura de la acción.
+2. Crear y activar entorno virtual
+python3 -m venv venv
+source venv/bin/activate   # En Linux / Mac
 
--   **High**: Precio máximo alcanzado durante el día.
 
--   **Low**: Precio mínimo alcanzado durante el día.
+3. Instalar dependencias
+pip install -r requirements.txt
 
--   **Close**: Precio de cierre de la acción.
+## Configuración
 
--   **Adj Close**: Precio de cierre ajustado por dividendos y splits.
+El proyecto utiliza variables de entorno definidas en .env.
 
--   **Volume**: Número de acciones negociadas.
+## Ejecución
 
-## Ejemplo de filas
+Ejecutar el pipeline completo:
 
-::: center
-      Date       Open     High     Low     Close    Adj Close   Volume
-  ------------ -------- -------- -------- -------- ----------- --------
-   2024-12-31   150.00   155.00   149.00   153.00    153.00     200000
-   2024-12-30   148.50   151.00   147.00   150.50    150.50     180000
-:::
+python main.py
 
-# Herramientas utilizadas
 
--   **Python 3.12** para la implementación del flujo ETL.
+## El flujo será:
 
--   **Pandas** para manipulación y transformación de datos.
+Lectura del CSV en data/raw/yt_sports_channels_stats.csv.
 
--   **Vim** como editor de código.
+Transformación y guardado de yt_sports_channels_stats_clean.csv en data/clean/.
 
--   **Git y GitHub** para control de versiones y gestión de ramas
-    (`main`, `develop`, `release`).
+Inserción en la base de datos youtube_channels.db.
 
--   **ChatGPT** para apoyo en la programación, depuración de errores y
-    recomendaciones de flujo ETL.
+Generación de gráficas en data/clean/.
 
-# Estructura del proyecto
+## Gráficas Generadas
 
--   Config/config.py
+Distribución de suscriptores → Histograma.
 
--   Extract/extractor.py
+Relación vistas vs suscriptores → Scatter plot.
 
--   Extract/Files/Nvidia.csv
+Top 10 canales por número de videos → Barplot.
 
--   Transform/transformer.py
+Ejemplo de salida:
 
--   Load/loader.py
+data/clean/barras_suscriptores.png
 
--   main.py
+data/clean/gauss_subs_views.png
 
-# Flujo ETL
+data/clean/scatter_videos_views.png
 
-## Extract
+Tecnologías
 
-Se implementó la clase `Extractor` en `Extract/extractor.py`, que lee el
-CSV original (`Nvidia.csv`) y retorna un DataFrame de Pandas.
+Python 3.12
 
-## Transform
+Pandas
+ - Manipulación de datos
 
-La clase `Transformer` en `Transform/transformer.py` realiza:
+SQLAlchemy
+- Conexión a la base de datos
 
--   Conversión de la columna `Date` a tipo `datetime64[ns]`.
+SQLite
+- Base de datos ligera
 
--   Ordenación por fecha.
+Seaborn
+ y Matplotlib
+ - Visualización
 
--   Relleno de valores nulos.
+Pydantic
+ + pydantic-settings
+ . Manejo de configuración
 
--   Cálculo de nuevas columnas:
+Mejoras Futuras
+  - Añadir soporte para PostgreSQL o MySQL.
 
-    -   `Daily Change` = `Close - Open`
+Automatizar descargas de nuevos datasets desde Kaggle API.
 
-    -   `Percent Change` = $\frac{Close - Open}{Open} \times 100$
+Agregar pruebas unitarias (pytest).
+Crear dashboard con Streamlit.
 
-## Load
-
-La clase `Loader` en `Load/loader.py` guarda el DataFrame final en un
-nuevo CSV llamado `Nvidia_clean.csv` en la carpeta `Extract/Files/`.
-
-# Prompts de ChatGPT más relevantes
-
--   Depurar errores de rutas y lectura de CSV.
-
--   Ajustar transformaciones de pandas para evitar errores con
-    `datetime64`.
-
--   Comandos de Git para el trabajo con ramas (`main`, `develop`,
-    `release`).
-
-# Resultados
-
-Al ejecutar el script principal:
-
-            python3 main.py
-
-Se obtiene:
-
--   Archivo limpio: `Extract/Files/Nvidia_clean.csv`
-
--   Columnas originales más `Daily Change` y `Percent Change`
-
--   5872 filas procesadas correctamente
-
-# Conclusiones
-
-El proyecto demuestra cómo construir un flujo ETL modular y reproducible
-usando Python. El uso de ChatGPT facilitó la depuración y la
-optimización de rutas y transformaciones. La gestión de ramas en Git
-permite un desarrollo ordenado y preparación de releases.
-
-[^1]: <https://www.kaggle.com/datasets/ranugadisansagamage/nividia-stock>
+Autor: José Luis Martínez
+Basado en dataset de Kaggle – YouTube Sports Channels Statistics
+https://www.kaggle.com/datasets/kanchana1990/youtube-sports-channels-statistics?resource=download
